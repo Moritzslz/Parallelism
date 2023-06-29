@@ -1,5 +1,6 @@
 package de.tum.in.ase.eist;
 
+import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class SwimmingPool {
@@ -16,6 +17,37 @@ public class SwimmingPool {
     }
 
     public void handleEntryRequest(Swimmer swimmer, SwimmingPoolActionOrder order) {
+        switch (order) {
+            case CHANGING_ROOM_BEFORE_LOCKER -> {
+                if (changingRoom.getOccupant().equals(Optional.empty()) && locker.getOccupant().equals(Optional.empty())) {
+                    changingRoom.acquireKey(swimmer);
+                    locker.storeClothes(swimmer);
+
+                    System.out.printf("Swimmer %d has gone swimming.\n", swimmer.getId());
+
+                    locker.retrieveClothes();
+                    changingRoom.releaseKey();
+                }
+            }
+            case LOCKER_BEFORE_CHANGING_ROOM -> {
+                if (changingRoom.getOccupant().equals(Optional.empty()) && locker.getOccupant().equals(Optional.empty())) {
+                    locker.storeClothes(swimmer);
+                    changingRoom.acquireKey(swimmer);
+
+                    System.out.printf("Swimmer %d has gone swimming.\n", swimmer.getId());
+
+                    changingRoom.releaseKey();
+                    locker.retrieveClothes();
+                }
+            }
+        }
+        totalVisitorsLock.lock();
+        totalVisitors++;
+        totalVisitorsLock.unlock();
+    }
+
+    public void handleEntryRequestDeadlockFree(Swimmer swimmer, SwimmingPoolActionOrder order) {
+        // TODO 3
         switch (order) {
             case CHANGING_ROOM_BEFORE_LOCKER -> {
                 changingRoom.acquireKey(swimmer);
@@ -39,11 +71,6 @@ public class SwimmingPool {
         totalVisitorsLock.lock();
         totalVisitors++;
         totalVisitorsLock.unlock();
-    }
-
-    public void handleEntryRequestDeadlockFree(Swimmer swimmer, SwimmingPoolActionOrder order) {
-        // TODO 3
-        handleEntryRequest(swimmer, order);
     }
 
     public int getTotalVisitors() {
