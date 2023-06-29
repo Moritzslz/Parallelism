@@ -44,43 +44,31 @@ public class SwimmingPool {
         totalVisitorsLock.unlock();
     }
 
-    public void handleEntryRequestDeadlockFree(Swimmer swimmer, SwimmingPoolActionOrder order) {
+    public synchronized void handleEntryRequestDeadlockFree(Swimmer swimmer, SwimmingPoolActionOrder order) {
         // TODO 3
         switch (order) {
             case CHANGING_ROOM_BEFORE_LOCKER -> {
-                if (bouncer == -1 || bouncer == 0) {
-                    bouncer = 0;
-                    changingRoom.acquireKey(swimmer);
-                    locker.storeClothes(swimmer);
+                changingRoom.acquireKey(swimmer);
+                locker.storeClothes(swimmer);
 
-                    System.out.printf("Swimmer %d has gone swimming.\n", swimmer.getId());
+                System.out.printf("Swimmer %d has gone swimming.\n", swimmer.getId());
 
-                    locker.retrieveClothes();
-                    changingRoom.releaseKey();
-                } else {
-                    System.out.println("Go away");
-                }
+                locker.retrieveClothes();
+                changingRoom.releaseKey();
             }
             case LOCKER_BEFORE_CHANGING_ROOM -> {
-                if (bouncer == -1 || bouncer == 1) {
-                    bouncer = 1;
-                    locker.storeClothes(swimmer);
-                    changingRoom.acquireKey(swimmer);
+                locker.storeClothes(swimmer);
+                changingRoom.acquireKey(swimmer);
 
-                    System.out.printf("Swimmer %d has gone swimming.\n", swimmer.getId());
+                System.out.printf("Swimmer %d has gone swimming.\n", swimmer.getId());
 
-                    changingRoom.releaseKey();
-                    locker.retrieveClothes();
-                }
-                else {
-                    System.out.println("Go away");
-                }
+                changingRoom.releaseKey();
+                locker.retrieveClothes();
             }
         }
         totalVisitorsLock.lock();
         totalVisitors++;
         totalVisitorsLock.unlock();
-        bouncer = -1;
     }
 
     public int getTotalVisitors() {
