@@ -29,7 +29,7 @@ public class Locker {
     public void retrieveClothes() {
         mutex.unlock();
         System.out.printf("Swimmer %d has retrieved their clothes from locker %d\n", this.occupant.get().getId(), this.id);
-
+        occupant = Optional.empty();
         // TODO 1
     }
 
