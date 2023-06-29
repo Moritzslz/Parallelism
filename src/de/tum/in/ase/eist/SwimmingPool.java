@@ -8,12 +8,14 @@ public class SwimmingPool {
     private final Locker locker;
     private int totalVisitors;
     private final ReentrantLock totalVisitorsLock;
+    private int bouncer;
 
     public SwimmingPool() {
         this.changingRoom = new ChangingRoom();
         this.locker = new Locker();
         this.totalVisitors = 0;
         this.totalVisitorsLock = new ReentrantLock();
+        this.bouncer = -1;
     }
 
     public void handleEntryRequest(Swimmer swimmer, SwimmingPoolActionOrder order) {
@@ -46,36 +48,39 @@ public class SwimmingPool {
         // TODO 3
         switch (order) {
             case CHANGING_ROOM_BEFORE_LOCKER -> {
-                changingRoom.getMutex().lock();
-                locker.getMutex().lock();
-                changingRoom.acquireKey(swimmer);
-                locker.storeClothes(swimmer);
+                if (bouncer == -1 || bouncer == 0) {
+                    bouncer = 0;
+                    changingRoom.acquireKey(swimmer);
+                    locker.storeClothes(swimmer);
 
-                System.out.printf("Swimmer %d has gone swimming.\n", swimmer.getId());
+                    System.out.printf("Swimmer %d has gone swimming.\n", swimmer.getId());
 
-                locker.retrieveClothes();
-                changingRoom.releaseKey();
-                changingRoom.getMutex().unlock();
-                locker.getMutex().unlock();
+                    locker.retrieveClothes();
+                    changingRoom.releaseKey();
+                } else {
+                    System.out.println("Go away");
+                }
             }
             case LOCKER_BEFORE_CHANGING_ROOM -> {
+                if (bouncer == -1 || bouncer == 1) {
+                    bouncer = 1;
+                    locker.storeClothes(swimmer);
+                    changingRoom.acquireKey(swimmer);
 
-                changingRoom.getMutex().lock();
-                locker.getMutex().lock();
-                locker.storeClothes(swimmer);
-                changingRoom.acquireKey(swimmer);
+                    System.out.printf("Swimmer %d has gone swimming.\n", swimmer.getId());
 
-                System.out.printf("Swimmer %d has gone swimming.\n", swimmer.getId());
-
-                changingRoom.releaseKey();
-                locker.retrieveClothes();
-                changingRoom.getMutex().unlock();
-                locker.getMutex().unlock();
+                    changingRoom.releaseKey();
+                    locker.retrieveClothes();
                 }
+                else {
+                    System.out.println("Go away");
+                }
+            }
         }
         totalVisitorsLock.lock();
         totalVisitors++;
         totalVisitorsLock.unlock();
+        bouncer = -1;
     }
 
     public int getTotalVisitors() {
