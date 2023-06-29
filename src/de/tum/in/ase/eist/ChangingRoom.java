@@ -19,12 +19,15 @@ public class ChangingRoom {
 
     public void acquireKey(Swimmer newOccupant) {
         // TODO 1
-
+        mutex.lock();
+        occupant = Optional.ofNullable(newOccupant);
         takeSomeTime(); // take some time to change in changing room
         System.out.printf("Swimmer %d has has acquired the key to the changing room %d\n", newOccupant.getId(), this.id);
     }
 
     public void releaseKey() {
+        mutex.unlock();
+        occupant = Optional.empty();
         System.out.printf("Swimmer %d has has released the key to the changing room %d\n", this.occupant.get().getId(), this.id);
 
         // TODO 1

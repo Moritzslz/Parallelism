@@ -20,12 +20,15 @@ public class Locker {
     // TODO 1
     public void storeClothes(Swimmer newOccupant) {
         // TODO 1
-
+        mutex.lock();
+        occupant = Optional.of(newOccupant);
         takeSomeTime(); // take some time to store clothes in locker
         System.out.printf("Swimmer %d has stored their clothes in locker %d\n", newOccupant.getId(), this.id);
     }
 
     public void retrieveClothes() {
+        mutex.unlock();
+        occupant = Optional.empty();
         System.out.printf("Swimmer %d has retrieved their clothes from locker %d\n", this.occupant.get().getId(), this.id);
 
         // TODO 1
