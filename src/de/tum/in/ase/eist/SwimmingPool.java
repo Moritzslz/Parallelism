@@ -19,7 +19,6 @@ public class SwimmingPool {
     public void handleEntryRequest(Swimmer swimmer, SwimmingPoolActionOrder order) {
         switch (order) {
             case CHANGING_ROOM_BEFORE_LOCKER -> {
-                if (changingRoom.getOccupant().equals(Optional.empty()) && locker.getOccupant().equals(Optional.empty())) {
                     changingRoom.acquireKey(swimmer);
                     locker.storeClothes(swimmer);
 
@@ -27,10 +26,8 @@ public class SwimmingPool {
 
                     locker.retrieveClothes();
                     changingRoom.releaseKey();
-                }
             }
             case LOCKER_BEFORE_CHANGING_ROOM -> {
-                if (changingRoom.getOccupant().equals(Optional.empty()) && locker.getOccupant().equals(Optional.empty())) {
                     locker.storeClothes(swimmer);
                     changingRoom.acquireKey(swimmer);
 
@@ -38,7 +35,6 @@ public class SwimmingPool {
 
                     changingRoom.releaseKey();
                     locker.retrieveClothes();
-                }
             }
         }
         totalVisitorsLock.lock();
@@ -50,22 +46,26 @@ public class SwimmingPool {
         // TODO 3
         switch (order) {
             case CHANGING_ROOM_BEFORE_LOCKER -> {
-                changingRoom.acquireKey(swimmer);
-                locker.storeClothes(swimmer);
+                if (changingRoom.getOccupant().equals(Optional.empty()) && locker.getOccupant().equals(Optional.empty())) {
+                    changingRoom.acquireKey(swimmer);
+                    locker.storeClothes(swimmer);
 
-                System.out.printf("Swimmer %d has gone swimming.\n", swimmer.getId());
+                    System.out.printf("Swimmer %d has gone swimming.\n", swimmer.getId());
 
-                locker.retrieveClothes();
-                changingRoom.releaseKey();
+                    locker.retrieveClothes();
+                    changingRoom.releaseKey();
+                }
             }
             case LOCKER_BEFORE_CHANGING_ROOM -> {
-                locker.storeClothes(swimmer);
-                changingRoom.acquireKey(swimmer);
+                if (changingRoom.getOccupant().equals(Optional.empty()) && locker.getOccupant().equals(Optional.empty())) {
+                    locker.storeClothes(swimmer);
+                    changingRoom.acquireKey(swimmer);
 
-                System.out.printf("Swimmer %d has gone swimming.\n", swimmer.getId());
+                    System.out.printf("Swimmer %d has gone swimming.\n", swimmer.getId());
 
-                changingRoom.releaseKey();
-                locker.retrieveClothes();
+                    changingRoom.releaseKey();
+                    locker.retrieveClothes();
+                }
             }
         }
         totalVisitorsLock.lock();
