@@ -46,27 +46,32 @@ public class SwimmingPool {
         // TODO 3
         switch (order) {
             case CHANGING_ROOM_BEFORE_LOCKER -> {
-                if (changingRoom.getOccupant().equals(Optional.empty()) && locker.getOccupant().equals(Optional.empty())) {
-                    changingRoom.acquireKey(swimmer);
-                    locker.storeClothes(swimmer);
+                changingRoom.getMutex().lock();
+                locker.getMutex().lock();
+                changingRoom.acquireKey(swimmer);
+                locker.storeClothes(swimmer);
 
-                    System.out.printf("Swimmer %d has gone swimming.\n", swimmer.getId());
+                System.out.printf("Swimmer %d has gone swimming.\n", swimmer.getId());
 
-                    locker.retrieveClothes();
-                    changingRoom.releaseKey();
-                }
+                locker.retrieveClothes();
+                changingRoom.releaseKey();
+                changingRoom.getMutex().unlock();
+                locker.getMutex().unlock();
             }
             case LOCKER_BEFORE_CHANGING_ROOM -> {
-                if (changingRoom.getOccupant().equals(Optional.empty()) && locker.getOccupant().equals(Optional.empty())) {
-                    locker.storeClothes(swimmer);
-                    changingRoom.acquireKey(swimmer);
+                changingRoom.getMutex().lock();
+                locker.getMutex().lock();
+                locker.storeClothes(swimmer);
+                changingRoom.acquireKey(swimmer);
 
-                    System.out.printf("Swimmer %d has gone swimming.\n", swimmer.getId());
+                System.out.printf("Swimmer %d has gone swimming.\n", swimmer.getId());
 
-                    changingRoom.releaseKey();
-                    locker.retrieveClothes();
-                }
+                changingRoom.releaseKey();
+                locker.retrieveClothes();
+                changingRoom.getMutex().unlock();
+                locker.getMutex().unlock();
             }
+
         }
         totalVisitorsLock.lock();
         totalVisitors++;

@@ -11,11 +11,11 @@ public class Main {
     public static void detectDeadlock(SwimmingPool swimmingPool) {
         // TODO 2
         Swimmer swimmer = new Swimmer();
-        Thread thread1 = new Thread(() -> swimmingPool.handleEntryRequest(swimmer, SwimmingPoolActionOrder.CHANGING_ROOM_BEFORE_LOCKER));
+        Thread thread1 = new Thread(() -> swimmer.goToSwimmingPool(swimmingPool, SwimmingPoolActionOrder.CHANGING_ROOM_BEFORE_LOCKER));
         thread1.start();
 
         Swimmer swimmer2 = new Swimmer();
-        Thread thread2 = new Thread(() -> swimmingPool.handleEntryRequest(swimmer2, SwimmingPoolActionOrder.LOCKER_BEFORE_CHANGING_ROOM));
+        Thread thread2 = new Thread(() -> swimmer2.goToSwimmingPool(swimmingPool, SwimmingPoolActionOrder.LOCKER_BEFORE_CHANGING_ROOM));
         thread2.start();
 
         try {
