@@ -17,5 +17,10 @@ public class Main {
         Swimmer swimmer2 = new Swimmer();
         Thread thread2 = new Thread(() -> swimmingPool.handleEntryRequest(swimmer2, SwimmingPoolActionOrder.LOCKER_BEFORE_CHANGING_ROOM));
         thread2.start();
+
+        try {
+            thread1.join();
+            thread2.join();
+        } catch (InterruptedException e) {}
     }
 }
