@@ -46,6 +46,9 @@ public class SwimmingPool {
         // TODO 3
         switch (order) {
             case CHANGING_ROOM_BEFORE_LOCKER -> {
+                while (changingRoom.getOccupant().isPresent() && locker.getOccupant().isPresent()) {
+
+                }
                 changingRoom.getMutex().lock();
                 locker.getMutex().lock();
                 changingRoom.acquireKey(swimmer);
@@ -59,6 +62,9 @@ public class SwimmingPool {
                 locker.getMutex().unlock();
             }
             case LOCKER_BEFORE_CHANGING_ROOM -> {
+                while (changingRoom.getOccupant().isPresent() && locker.getOccupant().isPresent()) {
+
+                }
                 changingRoom.getMutex().lock();
                 locker.getMutex().lock();
                 locker.storeClothes(swimmer);
@@ -70,8 +76,7 @@ public class SwimmingPool {
                 locker.retrieveClothes();
                 changingRoom.getMutex().unlock();
                 locker.getMutex().unlock();
-            }
-
+                }
         }
         totalVisitorsLock.lock();
         totalVisitors++;
