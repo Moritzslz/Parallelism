@@ -46,26 +46,19 @@ public class SwimmingPool {
 
     public synchronized void handleEntryRequestDeadlockFree(Swimmer swimmer, SwimmingPoolActionOrder order) {
         // TODO 3
-        switch (order) {
-            case CHANGING_ROOM_BEFORE_LOCKER -> {
-                changingRoom.acquireKey(swimmer);
-                locker.storeClothes(swimmer);
-
-                System.out.printf("Swimmer %d has gone swimming.\n", swimmer.getId());
-
-                locker.retrieveClothes();
-                changingRoom.releaseKey();
-            }
-            case LOCKER_BEFORE_CHANGING_ROOM -> {
-                locker.storeClothes(swimmer);
-                changingRoom.acquireKey(swimmer);
-
-                System.out.printf("Swimmer %d has gone swimming.\n", swimmer.getId());
-
-                changingRoom.releaseKey();
-                locker.retrieveClothes();
-            }
+        if (order != SwimmingPoolActionOrder.CHANGING_ROOM_BEFORE_LOCKER) {
+            System.out.printf("Swimmer %d entry request rejected. Invalid action order: %s\n", swimmer.getId(), order);
+            return;
         }
+
+        changingRoom.acquireKey(swimmer);
+        locker.storeClothes(swimmer);
+
+        System.out.printf("Swimmer %d has gone swimming.\n", swimmer.getId());
+
+        locker.retrieveClothes();
+        changingRoom.releaseKey();
+
         totalVisitorsLock.lock();
         totalVisitors++;
         totalVisitorsLock.unlock();
