@@ -14,6 +14,6 @@ public class Swimmer {
     }
 
     public void goToSwimmingPool(SwimmingPool swimmingPool, SwimmingPoolActionOrder order) {
-        swimmingPool.handleEntryRequestDeadlockFree(this, order);
+        swimmingPool.handleEntryRequest(this, order);
     }
 }
