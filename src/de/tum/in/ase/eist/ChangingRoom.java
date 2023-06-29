@@ -27,7 +27,7 @@ public class ChangingRoom {
 
     public void releaseKey() {
         mutex.unlock();
-        occupant = Optional.empty();
+        occupant = null;
         System.out.printf("Swimmer %d has has released the key to the changing room %d\n", this.occupant.get().getId(), this.id);
 
         // TODO 1
